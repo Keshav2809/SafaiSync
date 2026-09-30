@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Awareness — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5"><span class="text-success small fw-bold">WASTE AWARENESS</span><h1 class="fw-bold">Small habits create cleaner cities.</h1><div id="posts" class="row g-4 mt-2"></div></div>
+{% endblock %}
+{% block scripts %}<script>
+document.addEventListener("DOMContentLoaded",async()=>{
+ const posts=apiList(await api("/awareness/"));
+ document.getElementById("posts").innerHTML=posts.map(p=>`<div class="col-md-6 col-lg-4"><div class="feature-card h-100 p-4"><span class="badge text-bg-success-subtle text-success">${escapeHtml(p.category)}</span><h4 class="mt-3">${escapeHtml(p.title)}</h4><p class="text-secondary">${escapeHtml(p.content)}</p></div></div>`).join("");
+});
+</script>{% endblock %}

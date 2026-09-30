@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+{% block title %}Collector Dashboard — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5">
+<div class="mb-4"><span class="text-success small fw-bold">GARBAGE COLLECTOR PORTAL</span><h1 class="fw-bold">Welcome, {{ user.username }}.</h1><p class="text-secondary">Only work assigned to you is shown here.</p></div>
+<div class="row g-3 mb-4">
+<div class="col-md-4"><div class="stat-card"><small>Assigned Complaints</small><strong id="reportCount">0</strong></div></div>
+<div class="col-md-4"><div class="stat-card"><small>Assigned Pickups</small><strong id="pickupCount">0</strong></div></div>
+<div class="col-md-4"><div class="stat-card"><small>Work Completed</small><strong id="completedCount">0</strong></div></div>
+</div>
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+<h3>Assigned Waste Complaints</h3>
+<div class="table-responsive mt-3"><table class="table align-middle"><thead><tr><th>Reference</th><th>Issue</th><th>Address</th><th>Priority</th><th>Status</th></tr></thead><tbody id="reports"></tbody></table></div>
+</div>
+<div class="card border-0 shadow-sm rounded-4 p-4">
+<h3>Assigned Pickup Requests</h3>
+<div class="table-responsive mt-3"><table class="table align-middle"><thead><tr><th>Reference</th><th>Waste</th><th>Address</th><th>Date</th><th>Status</th></tr></thead><tbody id="pickups"></tbody></table></div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadCollector(){
+ try{
+  const reports=apiList(await api("/reports/"));
+  const pickups=apiList(await api("/pickups/"));
+  document.getElementById("reportCount").textContent=reports.length;
+  document.getElementById("pickupCount").textContent=pickups.length;
+  document.getElementById("completedCount").textContent=reports.filter(x=>x.status==="resolved").length+pickups.filter(x=>x.status==="completed").length;
+  document.getElementById("reports").innerHTML=reports.length?reports.map(r=>`<tr><td><b>${r.reference_code}</b></td><td>${escapeHtml(r.title)}</td><td>${escapeHtml(r.address)}</td><td>${r.priority}</td><td><select class="form-select form-select-sm" onchange="reportStatus(${r.id},this.value)">${["assigned","in_progress","resolved"].map(v=>`<option value="${v}" ${v===r.status?"selected":""}>${v.replaceAll("_"," ")}</option>`).join("")}</select></td></tr>`).join(""):'<tr><td colspan="5">No complaints assigned.</td></tr>';
+  document.getElementById("pickups").innerHTML=pickups.length?pickups.map(p=>`<tr><td><b>${p.reference_code}</b></td><td>${escapeHtml(p.waste_type)}</td><td>${escapeHtml(p.address)}</td><td>${p.preferred_date}</td><td><select class="form-select form-select-sm" onchange="pickupStatus(${p.id},this.value)">${["scheduled","picked_up","completed"].map(v=>`<option value="${v}" ${v===p.status?"selected":""}>${v.replaceAll("_"," ")}</option>`).join("")}</select></td></tr>`).join(""):'<tr><td colspan="5">No pickups assigned.</td></tr>';
+ }catch(e){
+  document.getElementById("reports").innerHTML=`<tr><td colspan="5" class="text-danger">${escapeHtml(e.message)}</td></tr>`;
+ }
+}
+async function reportStatus(id,status){try{await api(`/reports/${id}/collector_status/`,{method:"PATCH",body:JSON.stringify({status})});loadCollector()}catch(e){alert(e.message)}}
+async function pickupStatus(id,status){try{await api(`/pickups/${id}/collector_status/`,{method:"PATCH",body:JSON.stringify({status})});loadCollector()}catch(e){alert(e.message)}}
+loadCollector();
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Pickup Request — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5"><div class="row justify-content-center"><div class="col-lg-7">
+<div class="card border-0 shadow-sm rounded-4 p-4"><span class="text-success small fw-bold">COLLECTION</span><h2 class="fw-bold">Request Waste Pickup</h2>
+<form id="pickupForm" class="row g-3" novalidate>{% csrf_token %}
+{% for field in form %}<div class="col-12"><label class="form-label fw-semibold">{{ field.label }}</label>{{ field }}<div class="text-danger small field-error"></div></div>{% endfor %}
+<div class="col-12"><button class="btn btn-success">Request Pickup</button></div></form><div id="message" class="mt-3"></div>
+</div></div></div></div>
+{% endblock %}
+{% block scripts %}<script>
+const pickupForm=document.getElementById("pickupForm");
+const pickupDate=document.getElementById("id_preferred_date");
+if(pickupDate){
+  const now=new Date();
+  const local=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  pickupDate.min=local;
+}
+pickupForm.addEventListener("submit",async e=>{
+ e.preventDefault(); clearErrors(e.target);
+ const data=formToJSON(e.target);
+ if(!data.waste_type || data.waste_type.trim().length<2){
+   showApiError(e.target,new Error("Please enter a valid waste type.")); return;
+ }
+ if(!data.address || data.address.trim().length<5){
+   showApiError(e.target,new Error("Please enter a valid address.")); return;
+ }
+ if(!data.preferred_date || data.preferred_date < pickupDate.min){
+   showApiError(e.target,new Error("Please select today or a future pickup date.")); return;
+ }
+ try{const r=await api("/pickups/",{method:"POST",body:JSON.stringify(data)});
+ document.getElementById("message").innerHTML=`<div class="alert alert-success">Pickup requested. Reference ID: <b>${r.reference_code}</b></div>`;e.target.reset();
+ }catch(err){showApiError(e.target,err);}
+});
+</script>{% endblock %}

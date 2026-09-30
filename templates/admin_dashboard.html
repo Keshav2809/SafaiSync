@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5">
+<div class="mb-4"><span class="text-success small fw-bold">ADMIN CONTROL CENTER</span><h1 class="fw-bold">Sanitation Operations</h1><p class="text-secondary">Review complaints, pickup requests and trends.</p></div>
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="stat-card"><small>Total Reports</small><strong id="total">0</strong></div></div>
+<div class="col-md-3"><div class="stat-card"><small>Pending</small><strong id="pending">0</strong></div></div>
+<div class="col-md-3"><div class="stat-card"><small>Resolved</small><strong id="resolved">0</strong></div></div>
+<div class="col-md-3"><div class="stat-card"><small>Pending Pickups</small><strong id="pickups">0</strong></div></div>
+</div>
+<div class="row g-4">
+<div class="col-lg-6"><div class="card border-0 shadow-sm rounded-4 p-4"><h4>Complaints by Category</h4><canvas id="categoryChart"></canvas></div></div>
+<div class="col-lg-6"><div class="card border-0 shadow-sm rounded-4 p-4"><h4>Complaints by Status</h4><canvas id="statusChart"></canvas></div></div>
+</div>
+<div class="card border-0 shadow-sm rounded-4 p-4 mt-4"><div class="d-flex justify-content-between"><h3>Complaint Management</h3><input id="search" class="form-control w-auto" placeholder="Search..."></div><div class="table-responsive mt-3"><table class="table align-middle"><thead><tr><th>Reference</th><th>Citizen</th><th>Issue</th><th>Priority</th><th>Status</th></tr></thead><tbody id="adminReports"></tbody></table></div></div>
+<div class="card border-0 shadow-sm rounded-4 p-4 mt-4"><h3>Pickup Requests</h3><div class="table-responsive"><table class="table"><thead><tr><th>Reference</th><th>Citizen</th><th>Waste</th><th>Date</th><th>Status</th></tr></thead><tbody id="adminPickups"></tbody></table></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script>
+let categoryChart,statusChart;
+async function loadAdmin(){
+ const collectors=await api("/admin/collectors/");
+ window.collectorOptions=collectors.map(c=>`<option value="${c.id}">${escapeHtml(c.username)}</option>`).join("");
+ const s=await api("/admin/stats/"); document.getElementById("total").textContent=s.total_reports;document.getElementById("pending").textContent=s.pending_reports;document.getElementById("resolved").textContent=s.resolved_reports;document.getElementById("pickups").textContent=s.pending_pickups;
+ categoryChart?.destroy();statusChart?.destroy();
+ categoryChart=new Chart(document.getElementById("categoryChart"),{type:"doughnut",data:{labels:s.by_category.map(x=>x.category),datasets:[{data:s.by_category.map(x=>x.count)}]}});
+ statusChart=new Chart(document.getElementById("statusChart"),{type:"bar",data:{labels:s.by_status.map(x=>x.status),datasets:[{label:"Reports",data:s.by_status.map(x=>x.count)}]}});
+ loadReports();
+ const p=apiList(await api("/pickups/"));document.getElementById("adminPickups").innerHTML=p.map(x=>`<tr><td>${x.reference_code}</td><td>${escapeHtml(x.user_name)}</td><td>${escapeHtml(x.waste_type)}</td><td>${x.preferred_date}</td><td><select onchange="updatePickup(${x.id},this.value)">${["requested","scheduled","picked_up","completed","cancelled"].map(v=>`<option value="${v}" ${v===x.status?"selected":""}>${v}</option>`).join("")}</select><select class="form-select form-select-sm mt-1" onchange="assignPickup(${x.id},this.value)"><option value="">Assign collector...</option>${window.collectorOptions}</select></td></tr>`).join("");
+}
+async function loadReports(){
+ const q=document.getElementById("search").value; const r=apiList(await api("/reports/?q="+encodeURIComponent(q)));
+ document.getElementById("adminReports").innerHTML=r.map(x=>`<tr><td><b>${x.reference_code}</b></td><td>${escapeHtml(x.user_name)}</td><td>${escapeHtml(x.title)}<br><small>${escapeHtml(x.address)}</small></td><td>${x.priority}</td><td><select onchange="updateReport(${x.id},this.value)">${["submitted","under_review","assigned","in_progress","resolved","rejected"].map(v=>`<option value="${v}" ${v===x.status?"selected":""}>${v}</option>`).join("")}</select><select class="form-select form-select-sm mt-1" onchange="assignReport(${x.id},this.value)"><option value="">Assign collector...</option>${window.collectorOptions}</select></td></tr>`).join("");
+}
+async function updateReport(id,status){await api(`/reports/${id}/update_status/`,{method:"PATCH",body:JSON.stringify({status})});loadAdmin();}
+async function updatePickup(id,status){await api(`/pickups/${id}/update_status/`,{method:"PATCH",body:JSON.stringify({status})});loadAdmin();}
+async function assignReport(id,collector_id){if(!collector_id)return;await api(`/admin/reports/${id}/assign/`,{method:"PATCH",body:JSON.stringify({collector_id})});loadAdmin();}
+async function assignPickup(id,collector_id){if(!collector_id)return;await api(`/admin/pickups/${id}/assign/`,{method:"PATCH",body:JSON.stringify({collector_id})});loadAdmin();}
+document.getElementById("search").addEventListener("input",loadReports);loadAdmin();
+</script>{% endblock %}

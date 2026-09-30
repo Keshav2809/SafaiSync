@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Login — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5"><div class="row justify-content-center"><div class="col-md-5">
+<div class="card border-0 shadow-sm rounded-4 p-4"><h2 class="fw-bold">Welcome back</h2><p class="text-secondary">Login to your SafaiSync account.</p>
+<form method="post" novalidate>{% csrf_token %}{{ form.as_p }}<button class="btn btn-success w-100">Login</button></form>
+<hr><p class="small text-secondary mb-0">Admin users can use the Django admin to create staff accounts.</p></div>
+</div></div></div>
+{% endblock %}

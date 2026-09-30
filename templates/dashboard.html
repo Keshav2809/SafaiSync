@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5">
+<div class="d-flex justify-content-between align-items-end mb-4"><div><span class="text-success small fw-bold">CITIZEN PORTAL</span><h1 class="fw-bold">Welcome, {{ user.username }}.</h1><p class="text-secondary">Your sanitation activity at a glance.</p></div><a href="/report/" class="btn btn-success">+ Report Issue</a></div>
+<div class="row g-3 mb-4">
+<div class="col-md-3"><div class="stat-card"><small>Total Reports</small><strong id="totalReports">0</strong></div></div>
+<div class="col-md-3"><div class="stat-card"><small>Active Reports</small><strong id="activeReports">0</strong></div></div>
+<div class="col-md-3"><div class="stat-card"><small>Resolved</small><strong id="resolvedReports">0</strong></div></div>
+<div class="col-md-3"><div class="stat-card"><small>Pickups</small><strong id="pickupCount">0</strong></div></div>
+</div>
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4"><div class="d-flex justify-content-between"><h3>My Complaints</h3><a href="/report/" class="btn btn-outline-success btn-sm">New Report</a></div><div class="table-responsive mt-3"><table class="table align-middle"><thead><tr><th>Reference</th><th>Issue</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead><tbody id="reportsBody"></tbody></table></div></div>
+<div class="card border-0 shadow-sm rounded-4 p-4"><div class="d-flex justify-content-between"><h3>My Pickup Requests</h3><a href="/pickup/" class="btn btn-outline-success btn-sm">Request Pickup</a></div><div class="table-responsive mt-3"><table class="table"><thead><tr><th>Reference</th><th>Waste</th><th>Date</th><th>Status</th></tr></thead><tbody id="pickupBody"></tbody></table></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script>
+document.addEventListener("DOMContentLoaded", async () => {
+ try {
+ const reports = apiList(await api("/reports/"));
+ const pickups = apiList(await api("/pickups/"));
+ const active = reports.filter(x=>!["resolved","rejected"].includes(x.status)).length;
+ document.getElementById("totalReports").textContent = reports.length;
+ document.getElementById("activeReports").textContent = active;
+ document.getElementById("resolvedReports").textContent = reports.filter(x=>x.status==="resolved").length;
+ document.getElementById("pickupCount").textContent = pickups.length;
+ document.getElementById("reportsBody").innerHTML = reports.length ? reports.map(r=>`<tr><td><b>${r.reference_code}</b></td><td>${escapeHtml(r.title)}</td><td><span class="badge text-bg-light">${r.priority}</span></td><td><span class="status">${r.status.replaceAll("_"," ")}</span></td><td>${new Date(r.created_at).toLocaleDateString()}</td></tr>`).join("") : '<tr><td colspan="5">No complaints yet.</td></tr>';
+ document.getElementById("pickupBody").innerHTML = pickups.length ? pickups.map(p=>`<tr><td><b>${p.reference_code}</b></td><td>${escapeHtml(p.waste_type)}</td><td>${p.preferred_date}</td><td><span class="status">${p.status.replaceAll("_"," ")}</span></td></tr>`).join("") : '<tr><td colspan="4">No pickup requests yet.</td></tr>';
+ } catch(error) {
+   document.getElementById("reportsBody").innerHTML=`<tr><td colspan="5" class="text-danger">${escapeHtml(error.message)}</td></tr>`;
+   document.getElementById("pickupBody").innerHTML=`<tr><td colspan="4" class="text-danger">${escapeHtml(error.message)}</td></tr>`;
+ }
+});
+</script>{% endblock %}

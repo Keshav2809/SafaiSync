@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Report Issue — SafaiSync{% endblock %}
+{% block content %}
+<div class="container py-5"><div class="row g-4">
+<div class="col-lg-7"><div class="card border-0 shadow-sm rounded-4 p-4"><span class="text-success small fw-bold">CITIZEN ACTION</span><h2 class="fw-bold">Report a Waste Issue</h2>
+<form id="reportForm" class="row g-3" novalidate>{% csrf_token %}
+{% for field in form %}<div class="{% if field.name == 'description' or field.name == 'address' or field.name == 'photo_url' %}col-12{% else %}col-md-6{% endif %}"><label class="form-label fw-semibold">{{ field.label }}</label>{{ field }}<div class="text-danger small field-error"></div></div>{% endfor %}
+<div class="col-12"><button class="btn btn-success">Submit Complaint</button></div></form><div id="message" class="mt-3"></div></div></div>
+<div class="col-lg-5"><div class="card border-0 shadow-sm rounded-4 p-3"><h5>Select location on map</h5><p class="small text-secondary">Click the map to fill latitude and longitude.</p><div id="map"></div></div></div>
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const reportForm = document.getElementById("reportForm");
+const lat = document.getElementById("id_latitude"), lng = document.getElementById("id_longitude");
+const category = document.getElementById("id_category");
+const title = document.getElementById("id_title");
+const description = document.getElementById("id_description");
+const address = document.getElementById("id_address");
+
+function validateReportForm(){
+  if(!category.value) return "Please select an issue category.";
+  if(title.value.trim().length < 5) return "Title must contain at least 5 characters.";
+  if(description.value.trim().length < 10) return "Description must contain at least 10 characters.";
+  if(address.value.trim().length < 5) return "Please enter a valid address.";
+  if(lat.value && (Number(lat.value)<-90 || Number(lat.value)>90)) return "Latitude must be between -90 and 90.";
+  if(lng.value && (Number(lng.value)<-180 || Number(lng.value)>180)) return "Longitude must be between -180 and 180.";
+  return "";
+}
+const map = L.map("map").setView([26.4499,80.3319], 12);
+L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenTopoMap (CC-BY-SA) © OpenStreetMap contributors"}).addTo(map);
+map.on("tileerror", () => {
+  const mapBox=document.getElementById("map");
+  if(mapBox && !mapBox.querySelector(".map-error")){
+    const msg=document.createElement("div");
+    msg.className="map-error alert alert-warning position-absolute m-2";
+    msg.style.zIndex="1000";
+    msg.textContent="Map tiles could not be loaded. You can still enter latitude and longitude manually.";
+    mapBox.appendChild(msg);
+  }
+});
+setTimeout(() => map.invalidateSize(), 250);
+let marker;
+map.on("click", e => {lat.value=e.latlng.lat.toFixed(7); lng.value=e.latlng.lng.toFixed(7); if(marker) marker.setLatLng(e.latlng); else marker=L.marker(e.latlng).addTo(map);});
+reportForm.addEventListener("submit", async e => {
+ e.preventDefault(); clearErrors(reportForm);
+ const validationError=validateReportForm();
+ if(validationError){ showApiError(reportForm,new Error(validationError)); return; }
+ const data = formToJSON(reportForm);
+ try { const r = await api("/reports/", {method:"POST", body:JSON.stringify(data)});
+ document.getElementById("message").innerHTML=`<div class="alert alert-success">Complaint submitted. Reference ID: <b>${r.reference_code}</b></div>`;
+ reportForm.reset();
+ } catch(err) { showApiError(reportForm,err); }
+});
+</script>
+{% endblock %}
