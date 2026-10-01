@@ -1,11 +1,96 @@
 {% extends "base.html" %}
 {% block title %}Awareness — SafaiSync{% endblock %}
 {% block content %}
-<div class="container py-5"><span class="text-success small fw-bold">WASTE AWARENESS</span><h1 class="fw-bold">Small habits create cleaner cities.</h1><div id="posts" class="row g-4 mt-2"></div></div>
+<style>
+.aw-hero{background:linear-gradient(135deg,#08492e,#16915e 60%,#38c58a);color:#fff;border-radius:28px;padding:48px 32px;position:relative;overflow:hidden}
+.aw-hero .big{position:absolute;right:24px;top:10px;font-size:7rem;opacity:.18}
+.aw-tabs .btn{border-radius:50px;font-weight:600}
+.bin-pane{border-radius:22px;padding:26px;color:#fff}.bp-wet{background:linear-gradient(135deg,#15803d,#4ade80)}.bp-dry{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}.bp-haz{background:linear-gradient(135deg,#b91c1c,#f87171)}.bp-ewaste{background:linear-gradient(135deg,#6d28d9,#a78bfa)}
+.bin-pane ul{padding-left:1.1rem;margin:0}.bin-pane .no{background:rgba(0,0,0,.18);border-radius:14px;padding:12px 16px;margin-top:14px}
+.finder{background:#fff;border-radius:22px;border:2px dashed #38c58a;padding:26px}
+.tl-row{display:flex;align-items:center;gap:12px;margin:10px 0}.tl-row .lbl{width:150px;font-weight:600}.tl-bar{height:16px;border-radius:50px;background:linear-gradient(90deg,#4ade80,#facc15,#f87171);min-width:12px}
+.dd{border-radius:20px;padding:24px;height:100%}.dd.do{background:#e8f8ee;border:2px solid #4ade80}.dd.dont{background:#fdecec;border:2px solid #f87171}
+.rcard{background:#fff;border-radius:18px;padding:22px;height:100%;border-top:5px solid #38c58a;box-shadow:0 8px 24px rgba(20,70,45,.08);transition:.25s}.rcard:hover{transform:translateY(-6px)}
+.myth{background:#fff;border-radius:18px;padding:20px;height:100%;box-shadow:0 8px 24px rgba(20,70,45,.08)}
+</style>
+<div class="container py-5">
+<div class="aw-hero"><span class="big">♻️</span><span class="small fw-bold">WASTE AWARENESS CENTER</span>
+<h1 class="fw-bold display-5 mt-2">Small habits create<br>cleaner cities.</h1>
+<p class="lead mb-0" style="max-width:560px">Learn how to segregate, reduce and recycle waste, and know exactly what to do with every item at home.</p></div>
+
+<div class="text-center mt-5 mb-3"><span class="text-success small fw-bold">SEGREGATE RIGHT</span><h2 class="fw-bold">Which bin does it go in?</h2></div>
+<div class="finder mb-4"><label class="fw-semibold mb-2">🔍 Type any waste item (try: banana peel, battery, pizza box)</label>
+<input id="finderInput" class="form-control form-control-lg" placeholder="e.g. plastic bottle" list="items" autocomplete="off"><datalist id="items"></datalist>
+<div id="finderResult" class="mt-3 fs-5"></div></div>
+
+<div class="aw-tabs d-flex flex-wrap justify-content-center gap-2 mb-3" id="binTabs"></div>
+<div id="binPane" class="mb-5"></div>
+
+<div class="row g-4 mb-5">
+<div class="col-lg-6"><h3 class="fw-bold">⏳ How long does waste last?</h3><p class="text-secondary small">Approximate time to break down in the environment.</p><div id="timeline"></div></div>
+<div class="col-lg-6"><h3 class="fw-bold">♻️ The 3 Rs</h3><div class="row g-3">
+<div class="col-12"><div class="rcard"><b>1. Reduce</b><br>Carry a cloth bag and bottle, refuse single-use plastic, buy only what you need.</div></div>
+<div class="col-12"><div class="rcard"><b>2. Reuse</b><br>Reuse jars, bottles and boxes, repair before replacing, donate old clothes and books.</div></div>
+<div class="col-12"><div class="rcard"><b>3. Recycle</b><br>Give clean dry waste to authorised collectors and drop e-waste at designated centres.</div></div>
+</div></div></div>
+
+<div class="row g-4 mb-5">
+<div class="col-md-6"><div class="dd do"><h4>✅ Do</h4><ul class="mb-0"><li>Keep wet and dry waste in separate bins</li><li>Rinse containers before putting them in the dry bin</li><li>Wrap broken glass and sharp items in paper</li><li>Hand over waste to the collection vehicle on time</li><li>Report overflowing bins using SafaiSync</li></ul></div></div>
+<div class="col-md-6"><div class="dd dont"><h4>🚫 Don't</h4><ul class="mb-0"><li>Don't burn garbage, it releases toxic smoke</li><li>Don't throw waste in drains, rivers or open plots</li><li>Don't mix medicines, batteries or tubelights with household waste</li><li>Don't put food waste in plastic bags</li><li>Don't litter from vehicles or while walking</li></ul></div></div>
+</div>
+
+<div class="text-center mb-3"><span class="text-success small fw-bold">TRY AT HOME</span><h2 class="fw-bold">🌱 Make compost in 4 steps</h2></div>
+<div class="row g-3 mb-5">
+<div class="col-6 col-lg-3"><div class="rcard"><b>1. Pick a pot</b><br>Use a bucket or pot with small holes for air and drainage.</div></div>
+<div class="col-6 col-lg-3"><div class="rcard"><b>2. Layer it</b><br>Alternate kitchen scraps (green) with dry leaves or paper (brown).</div></div>
+<div class="col-6 col-lg-3"><div class="rcard"><b>3. Stir weekly</b><br>Mix to add air and keep it slightly moist, not soggy.</div></div>
+<div class="col-6 col-lg-3"><div class="rcard"><b>4. Use it</b><br>In 6 to 8 weeks you get dark, earthy compost for plants.</div></div>
+</div>
+
+<div class="text-center mb-3"><h2 class="fw-bold">💡 Myth vs Fact</h2></div>
+<div class="row g-3 mb-5">
+<div class="col-md-4"><div class="myth"><span class="badge bg-danger">MYTH</span> Wet and dry waste can go in one bin, the vehicle mixes it anyway.<br><span class="badge bg-success mt-2">FACT</span> Segregation at source makes recycling and composting possible.</div></div>
+<div class="col-md-4"><div class="myth"><span class="badge bg-danger">MYTH</span> Burning waste is the quickest way to get rid of it.<br><span class="badge bg-success mt-2">FACT</span> It pollutes air and harms lungs, especially for children and elders.</div></div>
+<div class="col-md-4"><div class="myth"><span class="badge bg-danger">MYTH</span> My small bit of litter doesn't matter.<br><span class="badge bg-success mt-2">FACT</span> Millions of small actions add up, and so do millions of small habits.</div></div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center"><h3 class="fw-bold mb-0">📢 Latest from the SafaiSync team</h3></div>
+<div id="posts" class="row g-4 mt-1 mb-5"></div>
+
+<div class="cta-banner"><h2 class="fw-bold">Ready to take action? 🌍</h2><p>Report a waste issue or schedule a pickup in a minute.</p>
+<a href="/report/" class="btn btn-light btn-lg fw-bold text-success me-2">Report an Issue</a><a href="/pickup/" class="btn btn-hero-ghost btn-lg">Request Pickup</a></div>
+</div>
 {% endblock %}
 {% block scripts %}<script>
+const BINS={
+ wet:{cls:"bp-wet",name:"🟢 Green Bin: Wet / Organic",yes:["Vegetable and fruit peels","Leftover cooked food","Tea leaves, coffee grounds","Garden waste, flowers","Eggshells"],no:["Plastic bags","Diapers, sanitary waste","Medicines"],tip:"Can be turned into compost at home or by the municipality."},
+ dry:{cls:"bp-dry",name:"🔵 Blue Bin: Dry / Recyclable",yes:["Paper, cardboard, newspapers","Plastic bottles and containers","Glass bottles, metal cans","Cloth, packaging","Tetra packs (rinsed)"],no:["Food-soiled items","Batteries","Broken tubelights"],tip:"Rinse and dry items so they can actually be recycled."},
+ haz:{cls:"bp-haz",name:"🔴 Red Bin: Hazardous / Sanitary",yes:["Used masks and bandages","Expired medicines","Sanitary pads, diapers (wrapped)","Paint, chemicals, insecticide cans","Broken glass (wrapped in paper)"],no:["Food waste","Clean paper","Mixed with wet waste"],tip:"Wrap sanitary and sharp items and mark them before disposal."},
+ ewaste:{cls:"bp-ewaste",name:"🟣 E-waste: Special Collection",yes:["Batteries, power banks","Old phones, chargers, cables","CFL bulbs, tubelights","Remotes, small electronics"],no:["Regular dustbin","Burning or breaking open"],tip:"Give to authorised e-waste centres or collection drives."}
+};
+const ITEMS={"banana peel":"wet","vegetable peels":"wet","fruit peel":"wet","leftover food":"wet","tea leaves":"wet","coffee grounds":"wet","eggshell":"wet","flowers":"wet","garden waste":"wet","rice":"wet","newspaper":"dry","cardboard":"dry","pizza box":"dry","plastic bottle":"dry","plastic bag":"dry","glass bottle":"dry","metal can":"dry","tin can":"dry","tetra pack":"dry","cloth":"dry","paper":"dry","shoes":"dry","thermocol":"dry","medicine":"haz","expired medicine":"haz","mask":"haz","bandage":"haz","sanitary pad":"haz","diaper":"haz","paint":"haz","insecticide":"haz","broken glass":"haz","syringe":"haz","battery":"ewaste","phone":"ewaste","charger":"ewaste","cable":"ewaste","tubelight":"ewaste","cfl bulb":"ewaste","power bank":"ewaste","earphones":"ewaste","remote":"ewaste"};
+const TL=[["Banana peel","2-5 weeks",5],["Paper","2-6 weeks",8],["Cotton cloth","1-5 months",18],["Plastic bag","10-20 years",55],["Aluminium can","~200 years",78],["Plastic bottle","~450 years",92],["Glass bottle","1,000,000+ years",100]];
+function showBin(k){
+ const b=BINS[k];
+ document.querySelectorAll("#binTabs .btn").forEach(x=>x.className="btn "+(x.dataset.k===k?"btn-success":"btn-outline-success"));
+ document.getElementById("binPane").innerHTML=`<div class="bin-pane ${b.cls}"><h3>${b.name}</h3><div class="row"><div class="col-md-6"><b>Put in this bin</b><ul>${b.yes.map(i=>"<li>"+i+"</li>").join("")}</ul></div><div class="col-md-6"><div class="no"><b>Never put here</b><ul>${b.no.map(i=>"<li>"+i+"</li>").join("")}</ul></div></div></div><p class="mt-3 mb-0">💡 ${b.tip}</p></div>`;
+}
 document.addEventListener("DOMContentLoaded",async()=>{
- const posts=apiList(await api("/awareness/"));
- document.getElementById("posts").innerHTML=posts.map(p=>`<div class="col-md-6 col-lg-4"><div class="feature-card h-100 p-4"><span class="badge text-bg-success-subtle text-success">${escapeHtml(p.category)}</span><h4 class="mt-3">${escapeHtml(p.title)}</h4><p class="text-secondary">${escapeHtml(p.content)}</p></div></div>`).join("");
+ document.getElementById("binTabs").innerHTML=Object.keys(BINS).map(k=>`<button class="btn btn-outline-success" data-k="${k}" onclick="showBin('${k}')">${BINS[k].name.split(":")[0]}</button>`).join("");
+ showBin("wet");
+ document.getElementById("items").innerHTML=Object.keys(ITEMS).map(i=>`<option value="${i}">`).join("");
+ document.getElementById("finderInput").addEventListener("input",e=>{
+  const q=e.target.value.trim().toLowerCase(),out=document.getElementById("finderResult");
+  if(!q){out.innerHTML="";return;}
+  const key=ITEMS[q]?q:Object.keys(ITEMS).find(i=>i.includes(q)||q.includes(i));
+  if(!key){out.innerHTML='<span class="text-secondary">Not in our list yet. When unsure, keep it separate and ask your collector.</span>';return;}
+  const b=BINS[ITEMS[key]];
+  out.innerHTML=`<b>${escapeHtml(key)}</b> goes in the <span class="badge fs-6" style="background:#16915e">${b.name.replace(/^[^ ]+ /,"")}</span>`;
+ });
+ document.getElementById("timeline").innerHTML=TL.map(t=>`<div class="tl-row"><span class="lbl">${t[0]}</span><div class="tl-bar" style="width:${t[2]*0.5}%"></div><small class="text-secondary">${t[1]}</small></div>`).join("");
+ try{
+  const posts=apiList(await api("/awareness/"));
+  document.getElementById("posts").innerHTML=posts.length?posts.map(p=>`<div class="col-md-6 col-lg-4"><div class="feature-card h-100 p-4"><span class="badge text-bg-success-subtle text-success">${escapeHtml(p.category)}</span><h4 class="mt-3">${escapeHtml(p.title)}</h4><p class="text-secondary mb-0">${escapeHtml(p.content)}</p></div></div>`).join(""):'<p class="text-secondary">No announcements yet.</p>';
+ }catch(e){document.getElementById("posts").innerHTML='<p class="text-secondary">Announcements will appear here.</p>';}
 });
 </script>{% endblock %}
