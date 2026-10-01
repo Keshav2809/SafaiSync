@@ -1,6 +1,4 @@
-import os
 import re
-import secrets
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -36,28 +34,13 @@ class RegistrationForm(UserCreationForm):
 
 
 class StaffRegistrationForm(RegistrationForm):
-    """Admin / collector sign-up, protected by a secret access code."""
-    access_code = forms.CharField(
-        label="Access code", widget=forms.PasswordInput(attrs={"autocomplete": "off"}),
-        help_text="Ask your SafaiSync administrator for this code.")
-
-    class Meta(RegistrationForm.Meta):
-        fields = ("username", "email", "phone", "address", "password1", "password2", "access_code")
+    """Admin / collector sign-up (no access code)."""
 
     def __init__(self, *args, role="collector", **kwargs):
         super().__init__(*args, **kwargs)
         self.role = role
         if role == "collector":
             self.fields["phone"].required = True
-
-    def clean_access_code(self):
-        code = self.cleaned_data["access_code"].strip()
-        expected = os.environ.get(
-            "ADMIN_SIGNUP_CODE" if self.role == "admin" else "COLLECTOR_SIGNUP_CODE",
-            "ADMIN-2026" if self.role == "admin" else "COLLECT-2026")
-        if not secrets.compare_digest(code.encode(), expected.encode()):
-            raise forms.ValidationError("Invalid access code.")
-        return code
 
 
 class ReportForm(forms.ModelForm):
