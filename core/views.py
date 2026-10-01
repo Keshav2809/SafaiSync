@@ -2,7 +2,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .forms import RegistrationForm, ReportForm, PickupForm
+from .forms import RegistrationForm, StaffRegistrationForm, ReportForm, PickupForm
 
 
 def _role_of(user):
@@ -83,6 +83,35 @@ def register(request):
         login(request, user)
         return redirect("dashboard")
     return render(request, "register.html", {"form": form})
+
+
+@ensure_csrf_cookie
+def staff_register(request, role):
+    if request.user.is_authenticated:
+        return redirect_for_role(request.user)
+    form = StaffRegistrationForm(request.POST or None, role=role)
+    if request.method == "POST" and form.is_valid():
+        user = form.save(commit=False)
+        user.email = form.cleaned_data["email"]
+        user.is_staff = role == "admin"
+        user.save()
+        profile = user.profile
+        profile.phone = form.cleaned_data.get("phone", "")
+        profile.address = form.cleaned_data.get("address", "")
+        profile.role = role
+        profile.save()
+        login(request, user)
+        return redirect_for_role(user)
+    label = "Admin" if role == "admin" else "Garbage Collector"
+    return render(request, "staff_register.html", {"form": form, "role": role, "role_label": label})
+
+
+def admin_register(request):
+    return staff_register(request, "admin")
+
+
+def collector_register(request):
+    return staff_register(request, "collector")
 
 
 @login_required
