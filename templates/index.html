@@ -1,27 +1,59 @@
 {% extends "base.html" %}
-{% block title %}SafaiSync — Cleaner Communities{% endblock %}
+{% block title %}SafaiSync — Cleaner Communities<section class="container py-5"><div class="section-title"><span>HOW IT WORKS</span><h2 class="fw-bold">From complaint to clean street</h2></div>
+<div class="row g-4">
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">📸</div><h5>1. Report</h5><p class="text-secondary small">Pick the spot on the map and describe the issue.</p></div></div>
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">🔎</div><h5>2. Review</h5><p class="text-secondary small">Admin verifies it and gives you a reference ID.</p></div></div>
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">🚛</div><h5>3. Collect</h5><p class="text-secondary small">A garbage collector is assigned and visits the site.</p></div></div>
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">✅</div><h5>4. Resolved</h5><p class="text-secondary small">Track every status change until it is cleaned.</p></div></div>
+</div></section>
+<section class="container pb-4"><div class="stats-band"><div class="row text-center g-3">
+<div class="col-6 col-md-3"><strong>6</strong>Complaint categories</div><div class="col-6 col-md-3"><strong>3</strong>Roles: citizen, collector, admin</div>
+<div class="col-6 col-md-3"><strong>5</strong>Step status tracking</div><div class="col-6 col-md-3"><strong>📍</strong>Map based reporting</div>
+</div></div></section>
+<section class="container py-5"><div class="cta-banner"><h2 class="fw-bold">See waste? Don't walk past it. 🌍</h2><p class="mb-3">Join SafaiSync and help your city stay clean.</p>
+<a href="{% if user.is_authenticated %}/report/{% else %}/register/{% endif %}" class="btn btn-light btn-lg fw-bold text-success">Get Started</a></div></section>
+{% endblock %}
 {% block content %}
 <section class="hero-section">
-<div class="container py-5"><div class="row align-items-center g-5 py-lg-5">
+<span class="float-emoji" style="top:12%;left:48%">♻️</span><span class="float-emoji" style="top:60%;left:4%;animation-delay:1s">🌱</span><span class="float-emoji" style="top:18%;right:4%;animation-delay:2s">🗑️</span><span class="float-emoji" style="bottom:20%;left:52%;animation-delay:3s">🚛</span>
+<div class="container pt-5 pb-5 mb-4"><div class="row align-items-center g-5 py-lg-4">
 <div class="col-lg-7">
-<span class="badge text-bg-success-subtle text-success mb-3">SMART • CLEAN • CONNECTED</span>
-<h1 class="display-2 fw-bold">Cleaner communities,<br><span class="text-success">one report at a time.</span></h1>
-<p class="lead text-secondary mt-3">Report sanitation issues, request waste pickups, track complaints and connect citizens with waste-management teams.</p>
-<div class="d-flex gap-2 mt-4">
-<a href="{% if user.is_authenticated %}/report/{% else %}/register/{% endif %}" class="btn btn-success btn-lg">Report an Issue</a>
-<a href="{% if user.is_authenticated %}/dashboard/{% else %}/login/{% endif %}" class="btn btn-outline-success btn-lg">Track Complaint</a>
-</div>
-</div>
-<div class="col-lg-5"><div class="hero-card p-4 shadow-sm bg-white rounded-4">
+<span class="hero-pill mb-3">♻ SMART • CLEAN • CONNECTED</span>
+<h1 class="display-2 fw-bold mt-3">Cleaner communities,<br><span class="hero-accent">one report at a time.</span></h1>
+<p class="lead mt-3">Report garbage, request waste pickups, track every complaint and connect citizens with waste-management teams.</p>
+<div class="d-flex flex-wrap gap-2 mt-4">
+<a href="{% if user.is_authenticated %}/report/{% else %}/register/{% endif %}" class="btn btn-light btn-lg fw-bold text-success">🗑️ Report an Issue</a>
+<a href="{% if user.is_authenticated %}/dashboard/{% else %}/login/{% endif %}" class="btn btn-hero-ghost btn-lg">Track Complaint</a>
+</div></div>
+<div class="col-lg-5"><div class="hero-card p-4 rounded-4">
 <div class="d-flex justify-content-between border-bottom pb-3"><span>Live civic platform</span><span class="text-success fw-bold">● Online</span></div>
-<div class="py-4 border-bottom"><h2 class="text-success">24/7</h2><span>Issue reporting</span></div>
-<div class="py-4 border-bottom"><h2 class="text-success">Track</h2><span>Complaint lifecycle</span></div>
-<div class="pt-4"><h2 class="text-success">Action</h2><span>Connected administration</span></div>
+<div class="py-3 border-bottom"><h2 class="text-success">🕒 24/7</h2><span>Issue reporting</span></div>
+<div class="py-3 border-bottom"><h2 class="text-success">📍 Track</h2><span>Complaint lifecycle</span></div>
+<div class="pt-3"><h2 class="text-success">🚛 Action</h2><span>Connected collectors &amp; admin</span></div>
 </div></div>
 </div></div></section>
+<section class="container pt-4"><div class="section-title"><span>SEGREGATE RIGHT</span><h2 class="fw-bold">Know your bins</h2></div>
+<div class="row g-4">
+<div class="col-md-4"><div class="bin-card bin-wet"><div class="bin-icon">🍌</div><h4 class="mt-2">Green Bin: Wet Waste</h4><p class="mb-0">Food scraps, vegetable peels, garden waste. Becomes compost.</p></div></div>
+<div class="col-md-4"><div class="bin-card bin-dry"><div class="bin-icon">🧴</div><h4 class="mt-2">Blue Bin: Dry Waste</h4><p class="mb-0">Paper, plastic, glass and metal. Goes to recycling.</p></div></div>
+<div class="col-md-4"><div class="bin-card bin-haz"><div class="bin-icon">🔋</div><h4 class="mt-2">Red Bin: Hazardous</h4><p class="mb-0">Batteries, e-waste, medical waste. Needs safe disposal.</p></div></div>
+</div></section>
 <section class="container py-5"><div class="row g-4">
 {% for icon,title,text in features %}
 <div class="col-md-6 col-lg-3"><div class="feature-card h-100 p-4"><div class="fs-2">{{ icon }}</div><h5 class="mt-3">{{ title }}</h5><p class="text-secondary">{{ text }}</p></div></div>
 {% endfor %}
 </div></section>
+<section class="container py-5"><div class="section-title"><span>HOW IT WORKS</span><h2 class="fw-bold">From complaint to clean street</h2></div>
+<div class="row g-4">
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">📸</div><h5>1. Report</h5><p class="text-secondary small">Pick the spot on the map and describe the issue.</p></div></div>
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">🔎</div><h5>2. Review</h5><p class="text-secondary small">Admin verifies it and gives you a reference ID.</p></div></div>
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">🚛</div><h5>3. Collect</h5><p class="text-secondary small">A garbage collector is assigned and visits the site.</p></div></div>
+<div class="col-6 col-lg-3"><div class="step-card"><div class="step-num">✅</div><h5>4. Resolved</h5><p class="text-secondary small">Track every status change until it is cleaned.</p></div></div>
+</div></section>
+<section class="container pb-4"><div class="stats-band"><div class="row text-center g-3">
+<div class="col-6 col-md-3"><strong>6</strong>Complaint categories</div><div class="col-6 col-md-3"><strong>3</strong>Roles: citizen, collector, admin</div>
+<div class="col-6 col-md-3"><strong>5</strong>Step status tracking</div><div class="col-6 col-md-3"><strong>📍</strong>Map based reporting</div>
+</div></div></section>
+<section class="container py-5"><div class="cta-banner"><h2 class="fw-bold">See waste? Don't walk past it. 🌍</h2><p class="mb-3">Join SafaiSync and help your city stay clean.</p>
+<a href="{% if user.is_authenticated %}/report/{% else %}/register/{% endif %}" class="btn btn-light btn-lg fw-bold text-success">Get Started</a></div></section>
 {% endblock %}
